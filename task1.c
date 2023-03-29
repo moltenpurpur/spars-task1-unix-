@@ -9,11 +9,11 @@
 char * copy_line(char * str) {
     char * res_str = malloc(sizeof(char) * (strlen(str) + 1));
     if (res_str != NULL){
-        strcopy(res_str, str);
+        strcpy(res_str, str);
         return res_str;
     }
     else {
-        prinf(stderr, "Failed to copy string. Out of memory.");
+        fprintf(stderr, "Failed to copy string. Out of memory.");
         exit(EXIT_FAILURE);
     }
 }
@@ -27,8 +27,8 @@ int main(int argc, char *argv[])
     int option;
 
     const struct option long_options[] = {
-        {"block_size", 1, NULL, 'b'},
-        {NULL, 0, NULL, 0}
+        {"block_size", required_argument, NULL, 'b'},
+        {NULL, no_argument, NULL, 0}
         };
 
     while ((option = getopt_long(argc, argv, "b:", long_options, NULL)) != -1)
@@ -36,41 +36,35 @@ int main(int argc, char *argv[])
         switch (option)
         {
         case 'b':
-            if (sscanf(optarg, "/d", &block_len) != 1){
-                prinf(stderr, "One argument expected.");
+            if (sscanf(optarg, "%d", &block_len) != 1){
+                fprintf(stderr, "One argument expected.");
                 exit(EXIT_FAILURE);
             }
 
             if (block_len <= 0) {
-                prinf(stderr, "Invalid number! Expected natural number.");
+                fprintf(stderr, "Invalid number! Expected natural number.");
                 exit(EXIT_FAILURE);
             }
             break;
-        
-        case 1:
-            if (in_file == NULL){
-                in_file = copy_line(optarg);
-                break;
-            }
-            if (out_file == NULL){
-                out_file = copy_line(optarg);
-                break;
-            }
-
         default:
             break;
         }
     }
 
-    if (in_file == NULL) {
-        prinf(stderr, "Enter file name.");
-        exit(EXIT_FAILURE);
-    }
-    if (out_file == NULL) {
-        out_file = in_file;
-        in_file = NULL;
-    }
+    in_file = argv[optind];
+    out_file = argv[optind+1];
+    printf("%s\n", in_file);
+    printf("%s\n", out_file);
+    printf("%d\n", block_len);
     
 
 
+    // if (in_file == NULL) {
+    //     printf(stderr, "Enter file name.");
+    //     exit(EXIT_FAILURE);
+    // }
+    // if (out_file == NULL) {
+    //     out_file = in_file;
+    //     in_file = NULL;
+    // }
 }
