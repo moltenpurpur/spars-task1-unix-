@@ -59,28 +59,30 @@ int main(int argc, char *argv[])
         }
     }
 
-    in_file = copy_line(argv[optind]);
-    out_file = copy_line(argv[optind+1]);
     int in_file_deskr;
     int out_file_deskr;
     
-    if (in_file == NULL) {
-        fprintf(stderr, "Enter file name.\n");
-        exit(EXIT_FAILURE);
-    }
-
-    if (out_file == NULL) {
+    if (argc == optind + 1) {
+        in_file = copy_line(argv[optind]);
         out_file = in_file;
+        in_file = NULL;
         in_file_deskr = 0;
         out_file_deskr = open(out_file, 
                               O_WRONLY | O_CREAT | O_TRUNC, 
-                              S_IRUSR | S_IWUSR);
+                              S_IRUSR | S_IWUSR, S_IRGRP);
         if (out_file_deskr == -1){
             fprintf(stderr, "Failed to open file.\n");
             exit(EXIT_FAILURE);
         }
     }
-    else { 
+    else if (argc == optind + 2){ 
+        in_file = copy_line(argv[optind]);
+        out_file = copy_line(argv[optind+1]);
+
+        if (strcmp(in_file, out_file) == 0) {
+        fprintf(stderr, "Files must not match.\n");
+        exit(EXIT_FAILURE);
+    }
         in_file_deskr = open(in_file, O_RDONLY);
 
         if (in_file_deskr == -1){
@@ -90,7 +92,7 @@ int main(int argc, char *argv[])
 
         out_file_deskr = open(out_file, 
                               O_WRONLY | O_CREAT | O_TRUNC, 
-                              S_IRUSR | S_IWUSR);
+                              S_IRUSR | S_IWUSR, S_IRGRP);
         
         if (out_file_deskr == -1){
             close(in_file_deskr);
@@ -98,12 +100,12 @@ int main(int argc, char *argv[])
             exit(EXIT_FAILURE);
         }
     }
-
-    if (strcmp(in_file, out_file) == 0) {
-        fprintf(stderr, "Files must not match.\n");
+    else{
+        fprintf(stderr, "Wrong numder of arguments.\n");
         exit(EXIT_FAILURE);
     }
-
+    
+    
     char * buffer = malloc(sizeof(char) * block_len + 1);
 
     if (buffer == NULL){
